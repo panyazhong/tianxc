@@ -1,0 +1,25 @@
+{
+  "name": "tianxc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "@types/koa": "^2.11.4",
+    "@types/koa-router": "^7.4.1"
+  },
+  "devDependencies": {
+    "concurrently": "^5.3.0",
+    "koa": "^2.13.0",
+    "koa-router": "^9.4.0",
+    "nodemon": "^2.0.4",
+    "ts-node": "^9.0.0"
+  },
+  "scripts": {
+    "dev": "tsc && concurrently npm:dev:*",
+    "dev:build": "tsc -w",
+    "dev:start": "nodemon node ./dist/index.js"
+  },
+  "keywords": [],
+  "author": "dapan",
+  "license": "ISC"
+}
