@@ -5,7 +5,14 @@
   "main": "index.js",
   "dependencies": {
     "@types/koa": "^2.11.4",
-    "@types/koa-router": "^7.4.1"
+    "@types/koa-bodyparser": "^4.3.0",
+    "@types/koa-router": "^7.4.1",
+    "@types/mongoose": "^5.7.36",
+    "koa-body": "^4.2.0",
+    "koa-bodyparser": "^4.3.0",
+    "mongoose": "^5.10.0",
+    "reflect-metadata": "^0.1.13",
+    "ts-md5": "^1.2.7"
   },
   "devDependencies": {
     "concurrently": "^5.3.0",
