@@ -11,9 +11,10 @@ const app = new Koa();
 // app.use(bodyParser());
 app.use(
   KoaBody({
-    multipart: true,
+    multipart: true, // 支持文件上传
+    strict: false,
     formidable: {
-      maxFileSize: config.upload_img_size,
+      maxFileSize: 200 * 1024 * 1024, // 设置上传文件大小最大限制，默认2M
     },
   })
 );
