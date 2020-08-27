@@ -1,28 +1,29 @@
-import roleModel from '../database/models/roleModel'
-import { post, get, controller, use } from '../../decorator'
-import generatorRes from '../../utils/generatorRes'
-import { Code } from './config'
-import checkToken from '../../utils/checkToken'
+import roleModel from '../database/models/roleModel';
+import { post, get, controller, use } from '../../decorator';
+import generatorRes from '../../utils/generatorRes';
+import { Code } from './config';
+import checkToken from '../../utils/checkToken';
 
 @controller('/api/role')
 class Role {
   constructor() {}
 
   @post('/createRole')
+  @use(checkToken)
   async createRole(ctx: any) {
-    const { role_name } = ctx.request.body
+    const { role_name } = ctx.request.body;
 
     if (role_name) {
       try {
         const res = await roleModel.create({
           role_name,
-        })
+        });
 
         if (res._id) {
-          ctx.response.body = generatorRes(Code.success, '新增成功')
+          ctx.response.body = generatorRes(Code.success, '新增成功');
         }
       } catch (error) {
-        ctx.response.body = generatorRes(Code.error, error)
+        ctx.response.body = generatorRes(Code.error, error);
       }
     }
   }
@@ -31,10 +32,11 @@ class Role {
   @use(checkToken)
   async getRoles(ctx: any) {
     try {
-      const res = await roleModel.find()
-      ctx.response.body = generatorRes(Code.success, undefined, res)
+      const res = await roleModel.find();
+      ctx.response.body = generatorRes(Code.success, undefined, res);
     } catch (error) {
-      ctx.response.body = generatorRes(Code.error, error)
+      console.log(error);
+      ctx.response.body = generatorRes(Code.error, error);
     }
   }
 }

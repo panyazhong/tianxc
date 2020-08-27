@@ -1,6 +1,6 @@
 import Koa from 'koa';
 import KoaBody from 'koa-body';
-// import bodyParser from 'koa-bodyparser';
+import cors from 'koa2-cors';
 import router from './router';
 
 import config from './config';
@@ -9,16 +9,19 @@ import './app/api';
 const app = new Koa();
 
 // app.use(bodyParser());
-app.use(
-  KoaBody({
-    multipart: true, // 支持文件上传
-    strict: false,
-    formidable: {
-      maxFileSize: 200 * 1024 * 1024, // 设置上传文件大小最大限制，默认2M
-    },
-  })
-);
-app.use(router.routes()).use(router.allowedMethods());
+app
+  .use(
+    KoaBody({
+      multipart: true, // 支持文件上传
+      strict: false,
+      formidable: {
+        maxFileSize: 200 * 1024 * 1024, // 设置上传文件大小最大限制，默认2M
+      },
+    })
+  )
+  .use(cors())
+  .use(router.routes())
+  .use(router.allowedMethods());
 
 //设置监听端口
 app.listen(config.port, () => {
