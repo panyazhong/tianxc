@@ -123,4 +123,28 @@ class User {
       ctx.response.body = generatorRes(Code.success, '编辑成功');
     } catch (error) {}
   }
+
+  @get('/getUserInfo')
+  @use(checkToken)
+  async getUserInfo(ctx: any) {
+    try {
+      const { user_id } = ctx.request.next;
+      const res = await userModel
+        .findOne(
+          {
+            _id: user_id,
+          },
+          {
+            username: 1,
+          }
+        )
+        .populate('role', {
+          role_name: 1,
+        });
+
+      ctx.response.body = generatorRes(Code.success, undefined, res);
+    } catch (error) {
+      ctx.response.body = generatorRes(Code.error, error);
+    }
+  }
 }

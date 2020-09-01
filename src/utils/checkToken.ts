@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 export default async function checkToken(ctx: any, next: any) {
   const { authorization } = ctx.request.header;
   if (!authorization) {
-    ctx.response.body = generatorRes(Code.token_error, '请先登录');
+    ctx.response.body = generatorRes(Code.token_error, '未携带token，请先登录');
   } else {
     const scheme = authorization.split(' ')[0];
     const token = authorization.split(' ')[1];
@@ -23,10 +23,13 @@ export default async function checkToken(ctx: any, next: any) {
 
         await next();
       } catch (error) {
-        ctx.response.body = generatorRes(Code.token_timeout, '请登录');
+        ctx.response.body = generatorRes(
+          Code.token_error,
+          'token过期，请先登录!'
+        );
       }
     } else {
-      ctx.response.body = generatorRes(Code.token_error, '请先登录');
+      ctx.response.body = generatorRes(Code.token_error, 'token异常，请先登录');
     }
   }
 }

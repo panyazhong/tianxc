@@ -23,9 +23,11 @@ class Upload {
   @use(checkToken)
   async uploadExcel(ctx: any) {
     const { file } = ctx.request.files,
+      { upload_excel_titles, upload_excel_content } = ctx.request.body,
       { user_id } = ctx.request.next,
       { name } = file,
       upload_name = name.split('.')[0];
+
     const res = await uploadFile(file),
       { status, path } = res as uploadInteface,
       upload_time = new Date().getTime();
@@ -35,6 +37,8 @@ class Upload {
         upload_url: `${upyunConfig.domain}/${path}`,
         upload_time,
         upload_user: user_id,
+        upload_excel_titles,
+        upload_excel_content,
       });
 
       if (res!._id) {
@@ -53,11 +57,36 @@ class Upload {
     const { date } = ctx.request.query;
 
     try {
-      const res = await uploadModel.find({}).populate('upload_user', {
-        username: 1,
-      });
+      const res = await uploadModel
+        .find(
+          {},
+          {
+            upload_excel_titles: 0,
+            upload_excel_content: 0,
+          }
+        )
+        .populate('upload_user', {
+          username: 1,
+        });
 
       ctx.response.body = generatorRes(Code.success, undefined, res);
     } catch (error) {}
+  }
+
+  @get('/getExcelContent')
+  async getExcelContent(ctx: any) {
+    const { _id } = ctx.request.query;
+
+    try {
+      const content = await uploadModel.findById(_id, {
+        upload_name: 1,
+        upload_excel_titles: 1,
+        upload_excel_content: 1,
+      });
+
+      ctx.response.body = generatorRes(Code.success, undefined, content);
+    } catch (error) {
+      ctx.response.body = generatorRes(Code.error, error);
+    }
   }
 }
