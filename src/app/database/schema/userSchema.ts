@@ -4,7 +4,14 @@ const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
   id: mongoose.Types.ObjectId,
-  username: String,
+  username: {
+    type: String,
+    unique: true,
+  },
+  realname: {
+    type: String,
+    unique: true,
+  },
   password: String,
   role: {
     ref: 'role',

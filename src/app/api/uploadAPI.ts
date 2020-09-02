@@ -5,15 +5,40 @@ import { upyunConfig } from '../../utils/config';
 import { Code } from './config';
 import generatorRes from '../../utils/generatorRes';
 import checkToken from '../../utils/checkToken';
-
-function check() {
-  console.log('chekc');
-}
+import yellowCardModel from '../database/models/yellowCardModel';
 
 interface uploadInteface {
   status: any;
   path: string;
 }
+
+const getYellowCardUser = (content: string) => {
+  let arr_content = JSON.parse(content).map((item: any) => item['姓名']);
+
+  return arr_content.slice(-3);
+};
+
+const updateYellow = (user: String) => {
+  return new Promise((resolve: any, reject: any) => {
+    yellowCardModel
+      .update(
+        {
+          user: user,
+        },
+        {
+          $inc: {
+            yellowCard: 1,
+          },
+        }
+      )
+      .then((res) => {
+        resolve(res);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
 
 @controller('/api/upload')
 class Upload {
@@ -22,6 +47,7 @@ class Upload {
   @post('/uploadExcel')
   @use(checkToken)
   async uploadExcel(ctx: any) {
+    let _this = this;
     const { file } = ctx.request.files,
       { upload_excel_titles, upload_excel_content } = ctx.request.body,
       { user_id } = ctx.request.next,
@@ -40,6 +66,13 @@ class Upload {
         upload_excel_titles,
         upload_excel_content,
       });
+
+      const yellowCardUser = getYellowCardUser(upload_excel_content);
+
+      const yellowCardUserPromise = yellowCardUser.map((user: String) => {
+        updateYellow(user);
+      });
+      const setYellow = await Promise.all(yellowCardUserPromise);
 
       if (res!._id) {
         ctx.response.body = generatorRes(Code.success, '上传成功');

@@ -6,6 +6,7 @@ import userModel from '../database/models/userModel';
 import generatorRes from '../../utils/generatorRes';
 import { generatorToken } from '../../utils/generatorToken';
 import checkToken from '../../utils/checkToken';
+import yellowCardModel from '../database/models/yellowCardModel';
 
 @controller('/api/user')
 class User {
@@ -57,18 +58,24 @@ class User {
 
   @post('/register')
   async Register(ctx: any) {
-    let { username, password, role } = ctx.request.body;
+    let { username, password, role, realname } = ctx.request.body;
 
     password = Md5.hashStr(password);
 
     try {
       const res = await userModel.create({
         username,
+        realname,
         password,
         role,
       });
 
-      if (res._id) {
+      const yellowRes = await yellowCardModel.create({
+        user: realname,
+        yellowCard: 0,
+      });
+
+      if (res._id && yellowRes._id) {
         ctx.response.body = generatorRes(Code.success, '注册成功');
       }
     } catch (error) {

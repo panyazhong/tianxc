@@ -23,6 +23,7 @@ export default async function checkToken(ctx: any, next: any) {
 
         await next();
       } catch (error) {
+        console.log(error);
         ctx.response.body = generatorRes(
           Code.token_error,
           'token过期，请先登录!'
