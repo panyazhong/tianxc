@@ -10,6 +10,7 @@
     "@types/koa-router": "^7.4.1",
     "@types/koa2-cors": "^2.0.1",
     "@types/mongoose": "^5.7.36",
+    "axios": "^0.20.0",
     "jsonwebtoken": "^8.5.1",
     "koa-body": "^4.2.0",
     "koa-bodyparser": "^4.3.0",
