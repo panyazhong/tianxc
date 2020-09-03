@@ -6,6 +6,7 @@ import { Code } from './config';
 import generatorRes from '../../utils/generatorRes';
 import checkToken from '../../utils/checkToken';
 import yellowCardModel from '../database/models/yellowCardModel';
+import userModel from '../database/models/userModel';
 
 interface uploadInteface {
   status: any;
@@ -49,7 +50,11 @@ class Upload {
   async uploadExcel(ctx: any) {
     let _this = this;
     const { file } = ctx.request.files,
-      { upload_excel_titles, upload_excel_content } = ctx.request.body,
+      {
+        upload_excel_titles,
+        upload_excel_content,
+        ststistics_month,
+      } = ctx.request.body,
       { user_id } = ctx.request.next,
       { name } = file,
       upload_name = name.split('.')[0];
@@ -62,6 +67,7 @@ class Upload {
         upload_name,
         upload_url: `${upyunConfig.domain}/${path}`,
         upload_time,
+        ststistics_month,
         upload_user: user_id,
         upload_excel_titles,
         upload_excel_content,
@@ -85,7 +91,7 @@ class Upload {
   }
 
   @get('/getExcelList')
-  // @use(checkToken)
+  @use(checkToken)
   async getExcelList(ctx: any) {
     const { date } = ctx.request.query;
 
@@ -107,6 +113,7 @@ class Upload {
   }
 
   @get('/getExcelContent')
+  @use(checkToken)
   async getExcelContent(ctx: any) {
     const { _id } = ctx.request.query;
 
@@ -118,6 +125,60 @@ class Upload {
       });
 
       ctx.response.body = generatorRes(Code.success, undefined, content);
+    } catch (error) {
+      ctx.response.body = generatorRes(Code.error, error);
+    }
+  }
+
+  @get('/getUserRank')
+  @use(checkToken)
+  async getUserRank(ctx: any) {
+    try {
+      const { user_id } = ctx.request.next;
+      let { year } = ctx.request.query;
+
+      const start = new Date(`${year - 1}-12-31`).getTime();
+      const end = new Date(`${year + 1}-01-01`).getTime();
+
+      const user: any = await userModel.findById(user_id, {
+        realname: 1,
+      });
+
+      const { realname } = user;
+
+      const excel = await uploadModel.find({
+        ststistics_month: {
+          $gte: start,
+          $lt: end,
+        },
+      });
+      console.log(start);
+
+      const userRanks = excel.map((item: any) => {
+        let content = JSON.parse(item.upload_excel_content);
+        const userRank = content.filter(
+          (userItem: any) => userItem['姓名'] === realname
+        );
+        return {
+          rank_time: new Date(item.ststistics_month).getMonth() + 1,
+          rank: userRank[0]['排名'],
+        };
+      });
+
+      const MONTH_LENGTH = 12;
+      let res = [];
+      for (let i = 1; i <= 12; i++) {
+        let filters = userRanks.filter((userRank) => userRank.rank_time === i);
+        res.push(
+          filters.length > 0
+            ? filters[0]
+            : {
+                rank_time: i,
+                rank: 0,
+              }
+        );
+      }
+      ctx.response.body = generatorRes(Code.success, undefined, res);
     } catch (error) {
       ctx.response.body = generatorRes(Code.error, error);
     }

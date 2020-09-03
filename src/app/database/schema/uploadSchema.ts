@@ -10,6 +10,7 @@ const uploadSchema = new Schema({
   upload_name: String,
   upload_url: String,
   upload_time: String,
+  ststistics_month: Date,
   upload_excel_titles: String,
   upload_excel_content: String,
 });
