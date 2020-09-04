@@ -137,8 +137,10 @@ class Upload {
       const { user_id } = ctx.request.next;
       let { year } = ctx.request.query;
 
+      year = year || new Date().getFullYear();
+
       const start = new Date(`${year - 1}-12-31`).getTime();
-      const end = new Date(`${year + 1}-01-01`).getTime();
+      const end = new Date(`${Number(year) + 1}-01-01`).getTime();
 
       const user: any = await userModel.findById(user_id, {
         realname: 1,
@@ -152,22 +154,22 @@ class Upload {
           $lt: end,
         },
       });
-      console.log(start);
 
       const userRanks = excel.map((item: any) => {
         let content = JSON.parse(item.upload_excel_content);
-        const userRank = content.filter(
-          (userItem: any) => userItem['姓名'] === realname
-        );
+        const userRank = content.filter((userItem: any) => {
+          return userItem['姓名'] === realname;
+        });
+
         return {
-          rank_time: new Date(item.ststistics_month).getMonth() + 1,
-          rank: userRank[0]['排名'],
+          rank_time: new Date(Number(item.ststistics_month)).getMonth() + 1,
+          rank: userRank[0] ? userRank[0]['排名'] : 0,
         };
       });
 
       const MONTH_LENGTH = 12;
       let res = [];
-      for (let i = 1; i <= 12; i++) {
+      for (let i = 1; i <= MONTH_LENGTH; i++) {
         let filters = userRanks.filter((userRank) => userRank.rank_time === i);
         res.push(
           filters.length > 0
