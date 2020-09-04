@@ -144,6 +144,7 @@ class User {
           {
             username: 1,
             realname: 1,
+            created: 1,
           }
         )
         .populate('role', {
