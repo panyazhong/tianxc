@@ -1,12 +1,16 @@
 import Koa from 'koa';
 import KoaBody from 'koa-body';
 import cors from 'koa2-cors';
+import path from 'path';
+import koaStatic from 'koa-static';
 import router from './router';
 
 import config from './config';
 import './app/api';
 
 const app = new Koa();
+
+const staticPath = './static';
 
 // app.use(bodyParser());
 app
@@ -21,7 +25,8 @@ app
   )
   .use(cors())
   .use(router.routes())
-  .use(router.allowedMethods());
+  .use(router.allowedMethods())
+  .use(koaStatic(path.join(__dirname, staticPath)));
 
 //设置监听端口
 app.listen(config.port, () => {

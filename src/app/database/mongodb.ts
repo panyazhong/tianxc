@@ -3,9 +3,7 @@ import config from '../../config';
 
 const { mongodb } = config;
 
-const DB_NAME = 'root',
-  DB_PWD = '123456',
-  DB_URL = `mongodb://${DB_NAME}:${DB_PWD}@${mongodb.host}:${mongodb.port}/${mongodb.db}`;
+const DB_URL = `mongodb://${mongodb.user}:${mongodb.pwd}@${mongodb.host}:${mongodb.port}/${mongodb.db}`;
 
 mongoose.connect(DB_URL, {
   useNewUrlParser: true,
