@@ -32,7 +32,9 @@
   "scripts": {
     "dev": "tsc && concurrently npm:dev:*",
     "dev:build": "tsc -w",
-    "dev:start": "NODE_ENV=development nodemon node ./dist/index.js"
+    "dev:start": "NODE_ENV=development nodemon node ./dist/index.js",
+    "build": "tsc",
+    "start": "pm2 start ecosystem.config.js --env production"
   },
   "keywords": [],
   "author": "dapan",
