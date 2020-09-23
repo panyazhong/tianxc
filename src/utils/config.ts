@@ -1,14 +1,14 @@
 interface upyun {
-  server_name: string
-  operator_name: string
-  operator_pwd: string
-  rootDir: string
-  domain: string
+  server_name: string;
+  operator_name: string;
+  operator_pwd: string;
+  rootDir: string;
+  domain: string;
 }
 
 interface tokenInterface {
-  secret: string
-  expiresIn: string
+  secret: string;
+  expiresIn: string;
 }
 
 export const upyunConfig: upyun = {
@@ -16,10 +16,10 @@ export const upyunConfig: upyun = {
   operator_name: 'dapan',
   operator_pwd: '43XRsmdLiixQkNDdZ4ge8ZmrTuB1KVxU',
   rootDir: 'file',
-  domain: 'tianxc.uinout.cn',
-}
+  domain: 'http://tianxc.uinout.cn',
+};
 
 export const tokenConfig: tokenInterface = {
   secret: 'tianxc',
   expiresIn: '6h',
-}
+};

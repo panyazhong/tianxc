@@ -73,12 +73,12 @@ class Upload {
         upload_excel_content,
       });
 
-      const yellowCardUser = getYellowCardUser(upload_excel_content);
+      // const yellowCardUser = getYellowCardUser(upload_excel_content);
 
-      const yellowCardUserPromise = yellowCardUser.map((user: String) => {
-        updateYellow(user);
-      });
-      const setYellow = await Promise.all(yellowCardUserPromise);
+      // const yellowCardUserPromise = yellowCardUser.map((user: String) => {
+      //   updateYellow(user);
+      // });
+      // const setYellow = await Promise.all(yellowCardUserPromise);
 
       if (res!._id) {
         ctx.response.body = generatorRes(Code.success, '上传成功');
