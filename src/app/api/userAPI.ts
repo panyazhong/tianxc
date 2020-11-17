@@ -6,6 +6,7 @@ import userModel from '../database/models/userModel';
 import generatorRes from '../../utils/generatorRes';
 import { generatorToken } from '../../utils/generatorToken';
 import checkToken from '../../utils/checkToken';
+import parseExcel from '../../utils/parseExcel';
 import yellowCardModel from '../database/models/yellowCardModel';
 import roleModel from '../database/models/roleModel';
 
@@ -15,8 +16,8 @@ class User {
 
   @post('/login')
   async Login(ctx: any) {
-    let { username, password } = ctx.request.body;
-    if (!username || !password) {
+    let { account, password } = ctx.request.body;
+    if (!account || !password) {
       ctx.response.body = generatorRes(Code.error, '请填写用户名或密码');
     }
     password = Md5.hashStr(password);
@@ -24,11 +25,11 @@ class User {
       const res: any = await userModel
         .findOne(
           {
-            username,
+            account,
             password,
           },
           {
-            username: 1,
+            account: 1,
           }
         )
         .populate('role', {
@@ -38,16 +39,16 @@ class User {
       if (res && res._id) {
         const payload = {
           _id: res._id,
-          username: res.username,
+          account: res.account,
           role: res.role,
         };
         const token = generatorToken(payload);
 
-        const { username, role, _id } = res;
+        const { account, role, _id } = res;
 
         const result = {
           _id,
-          username,
+          account,
           role,
           token,
         };
@@ -62,20 +63,20 @@ class User {
 
   @post('/register')
   async Register(ctx: any) {
-    let { username, password, role, realname } = ctx.request.body;
+    let { account, password, role, username } = ctx.request.body;
 
     password = Md5.hashStr(password);
 
     try {
       const res = await userModel.create({
+        account,
         username,
-        realname,
         password,
         role,
       });
 
       // const yellowRes = await yellowCardModel.create({
-      //   user: realname,
+      //   user: username,
       //   yellowCard: 0,
       // })
 
@@ -90,23 +91,23 @@ class User {
   @get('/getUsers')
   @use(checkToken)
   async GetUsers(ctx: any) {
-    const { username } = ctx.request.query;
+    const { account } = ctx.request.query;
     try {
       let res;
-      if (username) {
-        const reg = new RegExp(username, 'g');
+      if (account) {
+        const reg = new RegExp(account, 'g');
         res = await userModel
           .find(
-            { $or: [{ username: reg }] },
-            { _id: 1, username: 1, created: 1, realname: 1 }
+            { $or: [{ account: reg }] },
+            { _id: 1, account: 1, created: 1, username: 1 }
           )
           .populate('role', { role_name: 1 });
       } else {
         res = await userModel
-          .find({}, { _id: 1, username: 1, created: 1, realname: 1 })
+          .find({}, { _id: 1, account: 1, created: 1, username: 1 })
           .populate('role', { role_name: 1 });
       }
-      ctx.response.body = generatorRes(Code.success, '查询成功', res);
+      ctx.response.body = generatorRes(Code.success, '', res);
     } catch (error) {
       ctx.response.body = generatorRes(Code.error, error);
     }
@@ -136,12 +137,12 @@ class User {
   @put('/editUser')
   @use(checkToken)
   async editUser(ctx: any) {
-    const { user_id, role, username } = ctx.request.body;
+    const { user_id, role, account } = ctx.request.body;
 
     try {
       const res = await userModel.findByIdAndUpdate(user_id, {
         role,
-        username,
+        account,
       });
       ctx.response.body = generatorRes(Code.success, '编辑成功');
     } catch (error) {}
@@ -158,8 +159,11 @@ class User {
             _id: user_id,
           },
           {
+            account: 1,
             username: 1,
-            realname: 1,
+            district: 1,
+            net: 1,
+            telephone: 1,
             created: 1,
           }
         )
@@ -201,6 +205,40 @@ class User {
       }
     } catch (error) {
       console.log(error);
+      ctx.response.body = generatorRes(Code.error, error);
+    }
+  }
+
+  @post('/batchAddUser')
+  async batchAddUser(ctx: any) {
+    const { file } = ctx.request.files;
+    const worksheet = parseExcel(file);
+    let users = worksheet[0].data;
+    users = users.splice(1);
+    const insertData = users.map((user: any) => {
+      const telephone = String(user[4]),
+        district = user[0],
+        net = user[1],
+        account = user[3],
+        username = user[2];
+      return {
+        district,
+        net,
+        account,
+        username,
+        telephone,
+        password: Md5.hashStr(`${account}${telephone.slice(-4)}`),
+        role: '5f44b30778d62e45b1598e08',
+      };
+    });
+
+    console.log(insertData.length);
+    // return;
+
+    try {
+      let res = await userModel.insertMany(insertData);
+      ctx.response.body = generatorRes(Code.success, '注册成功');
+    } catch (error) {
       ctx.response.body = generatorRes(Code.error, error);
     }
   }

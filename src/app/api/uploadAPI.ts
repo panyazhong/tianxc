@@ -1,6 +1,6 @@
 import uploadModel from '../database/models/uploadModel';
-import uploadFile from '../../utils/uploadFile.js';
-import { post, controller, use, get } from '../../decorator';
+import { uploadFile } from '../../utils/uploadFile.js';
+import { post, controller, use, get, del } from '../../decorator';
 import { upyunConfig } from '../../utils/config';
 import { Code } from './config';
 import generatorRes from '../../utils/generatorRes';
@@ -105,7 +105,7 @@ class Upload {
           }
         )
         .populate('upload_user', {
-          username: 1,
+          account: 1,
         });
 
       ctx.response.body = generatorRes(Code.success, undefined, res);
@@ -130,6 +130,30 @@ class Upload {
     }
   }
 
+  @del('/delExcelContent')
+  @use(checkToken)
+  async delExcelContent(ctx: any) {
+    try {
+      const { _id } = ctx.request.query;
+
+      const res = await uploadModel.deleteOne({
+        _id,
+      });
+
+      const { deletedCount, n } = res;
+
+      if (deletedCount === 1) {
+        ctx.response.body = generatorRes(Code.success, '删除成功');
+      }
+
+      if (n === 0 || deletedCount === 0) {
+        ctx.response.body = generatorRes(Code.error, '删除失败');
+      }
+    } catch (error) {
+      ctx.response.body = generatorRes(Code.error, error);
+    }
+  }
+
   @get('/getUserRank')
   @use(checkToken)
   async getUserRank(ctx: any) {
@@ -143,10 +167,10 @@ class Upload {
       const end = new Date(`${Number(year) + 1}-01-01`).getTime();
 
       const user: any = await userModel.findById(user_id, {
-        realname: 1,
+        username: 1,
       });
 
-      const { realname } = user;
+      const { username } = user;
 
       const excel = await uploadModel.find({
         ststistics_month: {
@@ -158,7 +182,7 @@ class Upload {
       const userRanks = excel.map((item: any) => {
         let content = JSON.parse(item.upload_excel_content);
         const userRank = content.filter((userItem: any) => {
-          return userItem['姓名'] === realname;
+          return userItem['姓名'] === username;
         });
 
         return {

@@ -3,7 +3,7 @@ import yellowCardModel from '../database/models/yellowCardModel';
 import { get, controller, use, post } from '../../decorator/index';
 import checkToken from '../../utils/checkToken';
 import generatorRes from '../../utils/generatorRes';
-import uploadFile from '../../utils/uploadFile.js';
+import { uploadFile } from '../../utils/uploadFile.js';
 import { upyunConfig } from '../../utils/config';
 import { Code } from './config';
 
@@ -22,7 +22,7 @@ class YellowCard {
     try {
       const res = await yellowCardModel
         .find({})
-        .populate('uploador', { username: 1, realname: 1 });
+        .populate('uploador', { account: 1, username: 1 });
 
       ctx.response.body = generatorRes(Code.success, undefined, res);
     } catch (error) {

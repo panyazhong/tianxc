@@ -19,7 +19,7 @@ app
       multipart: true, // 支持文件上传
       strict: false,
       formidable: {
-        maxFileSize: 200 * 1024 * 1024, // 设置上传文件大小最大限制，默认2M
+        maxFileSize: 300 * 1024 * 1024, // 设置上传文件大小最大限制，默认2M
       },
     })
   )

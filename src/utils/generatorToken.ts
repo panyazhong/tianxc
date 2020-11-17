@@ -3,7 +3,7 @@ import * as mongoose from 'mongoose';
 import { tokenConfig } from './config';
 
 export interface payloadInterface {
-  username: string;
+  account: string;
   role: {
     _id: string;
     role_name: string;
