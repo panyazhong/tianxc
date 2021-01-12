@@ -4,3 +4,4 @@ import './roleAPI';
 import './yellowcard';
 import './material';
 import './signAPI';
+import './beaconAPI';
