@@ -88,11 +88,11 @@ class Sign {
   @del('/deleteSignById')
   @use(checkToken)
   async deleteSignById(ctx: any) {
-    const { sign_id } = ctx.request.query;
+    const { _id } = ctx.request.query;
 
     try {
       const res = await signModel.deleteOne({
-        sign_id,
+        _id,
       });
 
       ctx.response.body = generatorRes(Code.success, '删除成功');
