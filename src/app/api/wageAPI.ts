@@ -12,9 +12,24 @@ class Wage {
 
   @get('/getWage')
   async getWage(ctx: any) {
-    const res = await wageModel.find().populate('user', {
-      username: 1,
-    });
+    const res = await wageModel.aggregate([
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'channelCode',
+          foreignField: 'channelCode',
+          as: 'userInfo',
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          wage: 1,
+          channelCode: 1,
+          'userInfo.username': 1,
+        },
+      },
+    ]);
     ctx.response.body = generatorRes(Code.success, undefined, res);
   }
 
