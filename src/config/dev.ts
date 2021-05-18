@@ -11,7 +11,7 @@ export interface ConfigSchema {
 }
 
 const devConfig: ConfigSchema = {
-  port: 3000,
+  port: 3001,
   mongodb: {
     host: '127.0.0.1',
     port: 27017,

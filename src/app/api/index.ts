@@ -5,3 +5,4 @@ import './yellowcard';
 import './material';
 import './signAPI';
 import './beaconAPI';
+import './wageAPI';

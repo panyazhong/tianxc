@@ -17,6 +17,10 @@ const userSchema = new Schema(
     },
     telephone: String,
     password: String,
+    channelCode: {
+      type: String,
+      unique: true,
+    },
     role: {
       ref: 'role',
       type: mongoose.Types.ObjectId,

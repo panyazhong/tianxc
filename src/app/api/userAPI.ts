@@ -242,4 +242,41 @@ class User {
       ctx.response.body = generatorRes(Code.error, error);
     }
   }
+
+  @put('/batchEditUser')
+  // @use(checkToken)
+  async batchEditUser(ctx: any) {
+    interface Info {
+      account: string;
+      channelCode: string;
+    }
+    const { file } = ctx.request.files;
+
+    const worksheet = parseExcel(file);
+    let users = worksheet[0].data;
+    users = users.splice(1);
+    const updateData: Info[] = users.map((item: any) => {
+      const account: string = item[0],
+        channelCode: string = item[1];
+
+      return {
+        account,
+        channelCode,
+      };
+    });
+
+    let promise = <any>[];
+    updateData.forEach((data: Info) => {
+      promise.push(
+        userModel.findOneAndUpdate(
+          { account: data.account },
+          { channelCode: data.channelCode }
+        )
+      );
+    });
+
+    await Promise.all(promise);
+
+    ctx.response.body = generatorRes(Code.success, '更新成功');
+  }
 }
