@@ -1,4 +1,5 @@
 import wageModel from '../database/models/wageModel';
+import userModel from '../database/models/userModel';
 
 import { get, controller, use, post } from '../../decorator/index';
 import checkToken from '../../utils/checkToken';
@@ -11,8 +12,40 @@ class Wage {
   constructor() {}
 
   @get('/getWage')
+  @use(checkToken)
   async getWage(ctx: any) {
+    const { account } = ctx.request.next;
+    const { time } = ctx.request.query;
+    const user: any = await userModel.findOne({
+      account,
+    });
+    const { channelCode } = user;
+
+    let query;
+    if (account === 'admin') {
+      query = {
+        $match: {},
+      };
+    } else if (time) {
+      const reg = new RegExp(time, 'i');
+      query = {
+        $match: {
+          channelCode,
+          wageMonth: {
+            $regex: reg,
+          },
+        },
+      };
+    } else {
+      query = {
+        $match: {
+          channelCode,
+        },
+      };
+    }
+
     const res = await wageModel.aggregate([
+      query,
       {
         $lookup: {
           from: 'users',
@@ -26,6 +59,7 @@ class Wage {
           _id: 1,
           wage: 1,
           channelCode: 1,
+          wageMonth: 1,
           'userInfo.username': 1,
         },
       },
@@ -37,6 +71,7 @@ class Wage {
   async batchAddWage(ctx: any) {
     try {
       const { file } = ctx.request.files;
+      const { time } = ctx.request.body;
       const worksheet = parseExcel(file);
 
       let data: any[] = worksheet[0].data;
@@ -49,6 +84,7 @@ class Wage {
         return {
           channelCode,
           wage,
+          wageMonth: time,
         };
       });
 

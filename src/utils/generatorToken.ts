@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken';
-import * as mongoose from 'mongoose';
 import { tokenConfig } from './config';
 
 export interface payloadInterface {

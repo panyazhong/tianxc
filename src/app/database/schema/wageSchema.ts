@@ -9,6 +9,7 @@ const wageSchema = new Schema(
       type: String,
     },
     wage: Number,
+    wageMonth: String,
   },
   { timestamps: { createdAt: 'created', updatedAt: 'updated' } }
 );
