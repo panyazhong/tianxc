@@ -63,7 +63,7 @@ class User {
 
   @post('/register')
   async Register(ctx: any) {
-    let { account, password, role, username } = ctx.request.body;
+    let { account, password, role, username, channelCode } = ctx.request.body;
 
     password = Md5.hashStr(password);
 
@@ -73,6 +73,7 @@ class User {
         username,
         password,
         role,
+        channelCode,
       });
 
       // const yellowRes = await yellowCardModel.create({
@@ -243,40 +244,49 @@ class User {
     }
   }
 
-  @put('/batchEditUser')
+  @post('/batchAddUserWithChannelCode')
   // @use(checkToken)
-  async batchEditUser(ctx: any) {
+  async batchAddUserWithChannelCode(ctx: any) {
     interface Info {
-      account: string;
       channelCode: string;
+      account: string;
+      net: string;
+      district: string;
+      localChain: string;
+      username: string;
+      telephone: string;
+      role: string;
+      password: any;
     }
     const { file } = ctx.request.files;
 
     const worksheet = parseExcel(file);
     let users = worksheet[0].data;
     users = users.splice(1);
-    const updateData: Info[] = users.map((item: any) => {
-      const account: string = item[0],
-        channelCode: string = item[1];
+    const insertData: Info[] = users.map((item: any) => {
+      const channelCode: string = item[0],
+        account: string = channelCode,
+        net: string = item[1],
+        district: string = item[3],
+        localChain: string = item[4],
+        username: string = item[5] ? item[5] : channelCode,
+        telephone: string = item[6] ? item[6] : channelCode;
 
       return {
-        account,
         channelCode,
+        account,
+        net,
+        district,
+        localChain,
+        username,
+        telephone,
+        role: '60b0ac739ee88364a0815bb9',
+        password: Md5.hashStr(`${channelCode}`),
       };
     });
 
-    let promise = <any>[];
-    updateData.forEach((data: Info) => {
-      promise.push(
-        userModel.findOneAndUpdate(
-          { account: data.account },
-          { channelCode: data.channelCode }
-        )
-      );
-    });
+    await userModel.insertMany(insertData);
 
-    await Promise.all(promise);
-
-    ctx.response.body = generatorRes(Code.success, '更新成功');
+    ctx.response.body = generatorRes(Code.success, '注册成功');
   }
 }

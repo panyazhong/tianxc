@@ -9,18 +9,19 @@ const userSchema = new Schema(
     net: String,
     account: {
       type: String,
-      unique: true,
+      // unique: true,
     },
     username: {
       type: String,
-      unique: true,
+      // unique: true,
     },
     telephone: String,
     password: String,
     channelCode: {
       type: String,
-      unique: true,
+      // unique: true,
     },
+    localChain: String,
     role: {
       ref: 'role',
       type: mongoose.Types.ObjectId,

@@ -8,7 +8,8 @@ const wageSchema = new Schema(
       ref: 'user',
       type: String,
     },
-    wage: Number,
+    title: Array,
+    wage: Array,
     wageMonth: String,
   },
   { timestamps: { createdAt: 'created', updatedAt: 'updated' } }

@@ -59,6 +59,7 @@ class Wage {
           _id: 1,
           wage: 1,
           channelCode: 1,
+          title: 1,
           wageMonth: 1,
           'userInfo.username': 1,
         },
@@ -75,13 +76,16 @@ class Wage {
       const worksheet = parseExcel(file);
 
       let data: any[] = worksheet[0].data;
+      const title = data[0];
+
       data = data.splice(1);
 
       const insertData = data.map((item) => {
         const channelCode = item[0],
-          wage = item[1];
+          wage = item.splice(1);
 
         return {
+          title,
           channelCode,
           wage,
           wageMonth: time,
