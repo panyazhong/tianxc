@@ -65,6 +65,7 @@ class Wage {
         },
       },
     ]);
+    console.log(res);
     ctx.response.body = generatorRes(Code.success, undefined, res);
   }
 
