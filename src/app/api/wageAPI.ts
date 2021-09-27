@@ -1,7 +1,7 @@
 import wageModel from '../database/models/wageModel';
 import userModel from '../database/models/userModel';
 
-import { get, controller, use, post } from '../../decorator/index';
+import { get, controller, use, post, del } from '../../decorator/index';
 import checkToken from '../../utils/checkToken';
 import generatorRes from '../../utils/generatorRes';
 import parseExcel from '../../utils/parseExcel';
@@ -95,6 +95,22 @@ class Wage {
       await wageModel.insertMany(insertData);
 
       ctx.response.body = generatorRes(Code.success);
+    } catch (error) {}
+  }
+
+  @del('/deleteWage')
+  @use(checkToken)
+  async deleteWage(ctx: any) {
+    try {
+      const { month } = ctx.request.query;
+
+      const res = await wageModel.deleteMany({
+        wageMonth: month,
+      });
+
+      if (res) {
+        ctx.response.body = generatorRes(Code.success);
+      }
     } catch (error) {}
   }
 }
